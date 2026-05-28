@@ -15,6 +15,8 @@
 
 ```text
 travel-plan-skill/
+├── CLAUDE.md
+├── OPENCLAW.md
 ├── SKILL.md
 └── references/
     ├── source_strategy.md
@@ -25,6 +27,8 @@ travel-plan-skill/
 ## 文件说明
 
 - `SKILL.md`：主流程说明，定义触发场景、六阶段规划流程和可视化出图模式。
+- `CLAUDE.md`：给 Claude Code 使用的兼容说明。
+- `OPENCLAW.md`：给 OpenClaw 或通用 Agent 使用的兼容说明。
 - `references/source_strategy.md`：数据源策略，比如小红书、酒店平台、交通平台、登录预检和降级规则。
 - `references/output_templates.md`：攻略输出模板，包括目的地候选、兴趣点清单、住宿、交通和最终攻略。
 - `references/visual_output.md`：可视化网页/海报/PNG/PDF 输出规范。
