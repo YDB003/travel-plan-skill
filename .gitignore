@@ -1,0 +1,13 @@
+# OS/editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local generated outputs
+*_visual_test*/
+screenshots/
+assets/
+
+# Secrets or local env
+.env
+.env.*
