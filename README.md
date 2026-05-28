@@ -1,28 +1,142 @@
-# Travel Plan Skill V2
+# Travel Plan Skill V2｜国内旅游攻略助手
 
-Codex skill for China domestic travel planning.
+这是一个用于 Codex 的国内旅游攻略规划 Skill，面向中国国内旅行（含港澳台）。它不是一次性“编攻略”的 prompt，而是把旅行规划拆成可确认、可核验、可出图的多阶段流程。
 
-## What It Does
+## 核心能力
 
-- Plans domestic trips in China, including Hong Kong, Macau, and Taiwan.
-- Supports quick and deep planning modes.
-- Uses staged decisions: basic info, destination, points of interest, lodging, transport, itinerary, and optional visual output.
-- Marks dynamic data such as hotel prices, availability, tickets, and reservations with confidence levels.
-- Supports visual travel guide output as local HTML, PNG, or PDF.
+- 支持快速版和深度版攻略规划。
+- 支持目的地推荐、兴趣点勾选、住宿策略、城际交通比价、完整行程生成。
+- 小红书优先用于点位发现、拍照机位、近期热度和避雷反馈。
+- 酒店推荐只保留一个主来源链接，并给出推荐理由；需要比价时再补查其他平台。
+- 对酒店价格、余房、车票、机票、预约规则等动态数据做可信度标注。
+- 支持可视化出图模式：生成本地 HTML 攻略页，并可截图为 PNG 或导出 PDF。
 
-## Structure
+## 目录结构
 
 ```text
-.
+travel-plan-skill/
 ├── SKILL.md
-└── references
-    ├── output_templates.md
+└── references/
     ├── source_strategy.md
+    ├── output_templates.md
     └── visual_output.md
 ```
 
-## Notes
+## 文件说明
 
-- Xiaohongshu is preferred for point-of-interest discovery, but the default output links to search result pages instead of scraping individual posts.
-- Hotel recommendations use one stable primary source link plus a recommendation reason.
-- For visual output, AI-generated images must be clearly labeled and must not be presented as real photos or real navigation maps.
+- `SKILL.md`：主流程说明，定义触发场景、六阶段规划流程和可视化出图模式。
+- `references/source_strategy.md`：数据源策略，比如小红书、酒店平台、交通平台、登录预检和降级规则。
+- `references/output_templates.md`：攻略输出模板，包括目的地候选、兴趣点清单、住宿、交通和最终攻略。
+- `references/visual_output.md`：可视化网页/海报/PNG/PDF 输出规范。
+
+## 关键规则
+
+### 1. 平台登录预检
+
+深度版开始前，如果任务涉及平台数据，会先做一次平台登录预检，让用户统一登录本次可能需要的平台。
+
+可能涉及的平台包括：
+
+- 携程
+- 飞猪
+- 去哪儿
+- 小红书
+- 大众点评 / 美团
+- 抖音 / 快手
+- 12306
+- 航司官网
+- 地图服务
+
+登录后如果仍然因为风控、地区限制或动态加载问题无法访问，会标注为「登录后仍不可访问」，再降级为搜索线索或其他来源。
+
+### 2. 小红书点位优先
+
+点位发现、拍照机位、近期热度和避雷反馈优先使用小红书。
+
+默认不抓取每一篇笔记，只输出小红书搜索结果页入口，例如：
+
+```text
+https://www.xiaohongshu.com/search_result_ai?keyword={URL编码后的关键词}&source=web_explore_feed
+```
+
+只有用户明确要求“深挖某个点位”时，才尝试抓取网页端可见帖子内容。
+
+### 3. 酒店推荐格式
+
+酒店数据优先从携程、飞猪、去哪儿中选择一个信息最完整、链接最稳定的平台作为主来源。
+
+住宿推荐表只贴一个主来源链接，并给出推荐理由：
+
+```markdown
+| 方案 | 酒店 | 主来源 | 推荐理由 |
+|---|---|---|---|
+| A 推荐 | XX酒店 | [携程](链接) | 位置方便，评分稳定，预算匹配 |
+```
+
+如果用户要求比价，再补查其他平台。
+
+### 4. 交通必须对比
+
+城际交通不能只说“坐高铁”或“坐飞机”，需要综合：
+
+- 余票风险
+- 价格
+- 门到门时间
+- 到达和返程时间是否合理
+- 换乘和延误风险
+
+最终给出推荐方式和购票入口。
+
+### 5. 可视化出图
+
+当用户要求：
+
+- 出图
+- 海报
+- 可视化攻略
+- 网页版
+- PNG / PDF
+- 或提供类似视觉参考图
+
+Skill 会先完成可核验的文字攻略，再生成本地 HTML 视觉攻略页，并按需截图为 PNG 或导出 PDF。
+
+如果使用 AI 生成图片，必须明确标注为「AI 生成氛围图」或「AI 生成路线插图」，不能伪装成真实景点照片或真实导航图。
+
+## 使用示例
+
+```text
+用 travel-plan 帮我做一个深度版攻略：
+端午节杭州出发，3人2房，去大连，住宿600左右，吃喝打卡。
+```
+
+```text
+下周末杭州出发，3人2房，800左右，去平潭，吃和打卡，帮我做攻略。
+```
+
+```text
+端午杭州出发，3人2房，贵州，可以前一天晚上出发。
+按可视化网页模式出图。
+```
+
+## 安装方式
+
+将整个目录复制到 Codex skills 目录：
+
+```text
+C:\Users\<你的用户名>\.codex\skills\travel-plan
+```
+
+例如：
+
+```powershell
+Copy-Item -Recurse "C:\path\to\travel-plan-skill" "C:\Users\<你的用户名>\.codex\skills\travel-plan"
+```
+
+安装后重启 Codex，让 Skill 生效。
+
+## 注意事项
+
+- 所有价格、余房、余票、预约规则都属于动态信息，必须以下单或官方平台最终显示为准。
+- 小红书、大众点评、美团等平台可能有登录、风控或地区限制。
+- 可视化页面中的 AI 图片只用于氛围表达，不代表真实路线或真实景点实拍。
+- 旅行路线中的导航时间以高德、百度地图等地图 App 为准。
